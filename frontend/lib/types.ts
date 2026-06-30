@@ -2,6 +2,8 @@ export type User = {
   id: string;
   email: string;
   full_name: string;
+  role: "ADMIN" | "USER" | "SUPER_ADMIN";
+  is_verified?: boolean;
   is_active: boolean;
   is_superuser: boolean;
   created_at: string;
@@ -35,6 +37,11 @@ export type ChatDetail = Chat & {
 };
 
 export type ApiError = {
+  message?: string;
+  errors?: Array<{
+    field?: string;
+    message?: string;
+  }>;
   error?: {
     message?: string;
     code?: string;

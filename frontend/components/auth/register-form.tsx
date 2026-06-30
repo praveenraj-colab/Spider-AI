@@ -25,7 +25,7 @@ export function RegisterForm() {
     setIsSubmitting(true);
     try {
       await register({ full_name: fullName, email, password });
-      router.replace("/dashboard/chat");
+      router.replace("/login?registered=1");
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : "Unable to create account.");
     } finally {

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import uuid
 
 from fastapi import Depends, HTTPException, status
@@ -15,6 +16,7 @@ from app.repositories.user import UserRepository
 
 settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.api_v1_prefix}/auth/login")
+logger = logging.getLogger(__name__)
 
 
 async def get_current_user(
@@ -27,6 +29,7 @@ async def get_current_user(
             raise ValueError("Invalid token type.")
         user_id = uuid.UUID(str(payload.get("sub")))
     except (TypeError, ValueError):
+        logger.warning("Access token authentication failed.", extra={"reason": "invalid_token"})
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials.",
@@ -35,6 +38,10 @@ async def get_current_user(
 
     user = await UserRepository(db).get_active(user_id)
     if user is None:
+        logger.warning(
+            "Access token authentication failed.",
+            extra={"reason": "inactive_or_missing_user", "user_id": str(user_id)},
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User account is inactive or does not exist.",

@@ -3,7 +3,17 @@ import Link from "next/link";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams?: Promise<{
+    registered?: string;
+  }>;
+};
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const successMessage =
+    params?.registered === "1" ? "Account created successfully. Log in to continue." : undefined;
+
   return (
     <AuthShell
       title="Welcome back"
@@ -17,7 +27,7 @@ export default function LoginPage() {
         </>
       }
     >
-      <LoginForm />
+      <LoginForm successMessage={successMessage} />
     </AuthShell>
   );
 }

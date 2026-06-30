@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { backendUrl, setAuthCookies } from "@/lib/server/backend";
+import { backendUrl, fetchCurrentUser, setAuthCookies, type AuthTokens } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
   const payload = await request.json();
@@ -16,7 +16,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: backendResponse.status });
   }
 
-  const response = NextResponse.json({ user: data.user });
-  await setAuthCookies(response, data.tokens);
+  const tokens = data as AuthTokens;
+  let user: unknown;
+  try {
+    user = await fetchCurrentUser(tokens.access_token);
+  } catch {
+    return NextResponse.json({ error: { message: "Unable to load authenticated user." } }, { status: 401 });
+  }
+
+  const response = NextResponse.json({ user });
+  await setAuthCookies(response, tokens);
   return response;
 }

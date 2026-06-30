@@ -11,7 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiClientError } from "@/lib/api-client";
 
-export function LoginForm() {
+type LoginFormProps = {
+  successMessage?: string;
+};
+
+export function LoginForm({ successMessage }: LoginFormProps) {
   const router = useRouter();
   const { login } = useAuth();
   const [email, setEmail] = React.useState("");
@@ -25,7 +29,7 @@ export function LoginForm() {
     setIsSubmitting(true);
     try {
       await login({ email, password });
-      router.replace("/dashboard/chat");
+      router.replace("/dashboard");
     } catch (caught) {
       setError(caught instanceof ApiClientError ? caught.message : "Unable to sign in.");
     } finally {
@@ -62,6 +66,7 @@ export function LoginForm() {
           onChange={(event) => setPassword(event.target.value)}
         />
       </div>
+      {successMessage ? <p className="text-sm text-primary">{successMessage}</p> : null}
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
         {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

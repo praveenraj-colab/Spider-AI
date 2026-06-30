@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LogOut, Menu, MessageSquareText, Settings, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut, Menu, MessageSquareText, Settings, UserRound } from "lucide-react";
 
 import { useAuth } from "@/components/providers/auth-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -31,6 +31,12 @@ export function TopNav() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
             <DropdownMenuItem asChild>
+              <Link href="/dashboard" className="gap-2">
+                <LayoutDashboard className="h-4 w-4" />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href="/dashboard/chat" className="gap-2">
                 <MessageSquareText className="h-4 w-4" />
                 Chat
@@ -52,7 +58,7 @@ export function TopNav() {
         </DropdownMenu>
         <div>
           <p className="text-sm font-medium">Your Intelligent AI Workspace</p>
-          <p className="text-xs text-muted-foreground">Phase 1</p>
+          <p className="text-xs text-muted-foreground">Authentication ready</p>
         </div>
       </div>
       <div className="flex items-center gap-2">

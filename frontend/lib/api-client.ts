@@ -28,8 +28,12 @@ async function request<T>(input: RequestInfo | URL, init?: RequestInit): Promise
     } catch {
       payload = undefined;
     }
+    const validationMessage = payload?.errors
+      ?.map((error) => error.message)
+      .filter(Boolean)
+      .join(" ");
     throw new ApiClientError(
-      payload?.error?.message ?? "Request failed.",
+      validationMessage || payload?.message || payload?.error?.message || "Request failed.",
       response.status,
       payload?.error?.code
     );

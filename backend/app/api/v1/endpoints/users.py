@@ -10,14 +10,14 @@ from app.dependencies.db import get_db
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.common import DeleteResponse
-from app.schemas.user import UserRead, UserUpdate
+from app.schemas.user import UserRead, UserResponse, UserUpdate
 from app.services.user import UserService
 
 
 router = APIRouter()
 
 
-@router.get("/me", response_model=UserRead)
+@router.get("/me", response_model=UserResponse)
 async def read_me(current_user: User = Depends(get_current_user)) -> User:
     return current_user
 
@@ -45,7 +45,7 @@ async def list_users(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[User]:
-    if not current_user.is_superuser:
+    if not current_user.has_admin_access:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required.")
     return await UserRepository(db).list_users()
 
@@ -56,7 +56,7 @@ async def read_user(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    if not current_user.is_superuser and current_user.id != user_id:
+    if not current_user.has_admin_access and current_user.id != user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied.")
     user = await UserRepository(db).get(user_id)
     if user is None:

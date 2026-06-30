@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MessageSquareText, Settings, UserRound } from "lucide-react";
+import { LayoutDashboard, MessageSquareText, Settings, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navigation = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/chat", label: "Chat", icon: MessageSquareText },
   { href: "/dashboard/profile", label: "Profile", icon: UserRound },
   { href: "/dashboard/settings", label: "Settings", icon: Settings }
@@ -19,13 +20,13 @@ export function Sidebar() {
   return (
     <aside className="hidden h-screen w-64 shrink-0 border-r bg-background md:block">
       <div className="flex h-16 items-center border-b px-5">
-        <Link href="/dashboard/chat" className="text-lg font-semibold">
+        <Link href="/dashboard" className="text-lg font-semibold">
           Spider AI
         </Link>
       </div>
       <nav className="space-y-1 p-3">
         {navigation.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           return (
             <Button
               key={item.href}

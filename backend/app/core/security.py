@@ -27,21 +27,51 @@ def verify_password(password: str, password_hash: str) -> bool:
     return pwd_context.verify(password, password_hash)
 
 
-def create_access_token(subject: uuid.UUID, expires_delta: timedelta | None = None) -> str:
+def _create_jwt_token(
+    *,
+    subject: uuid.UUID,
+    token_type: str,
+    expires_delta: timedelta,
+    token_id: uuid.UUID | None = None,
+) -> str:
     settings = get_settings()
-    expires_at = utc_now() + (
-        expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
-    )
+    issued_at = utc_now()
+    expires_at = issued_at + expires_delta
     payload: dict[str, Any] = {
         "sub": str(subject),
         "exp": expires_at,
-        "iat": utc_now(),
-        "type": "access",
+        "iat": issued_at,
+        "type": token_type,
+        "jti": str(token_id or uuid.uuid4()),
     }
     return jwt.encode(
         payload,
         settings.secret_key.get_secret_value(),
         algorithm=settings.jwt_algorithm,
+    )
+
+
+def create_access_token(subject: uuid.UUID, expires_delta: timedelta | None = None) -> str:
+    settings = get_settings()
+    return _create_jwt_token(
+        subject=subject,
+        token_type="access",
+        expires_delta=expires_delta or timedelta(minutes=settings.access_token_expire_minutes),
+    )
+
+
+def create_refresh_token(
+    subject: uuid.UUID,
+    *,
+    token_id: uuid.UUID | None = None,
+    expires_delta: timedelta | None = None,
+) -> str:
+    settings = get_settings()
+    return _create_jwt_token(
+        subject=subject,
+        token_type="refresh",
+        token_id=token_id,
+        expires_delta=expires_delta or timedelta(days=settings.refresh_token_expire_days),
     )
 
 

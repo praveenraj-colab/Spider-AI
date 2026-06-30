@@ -3,16 +3,20 @@ from __future__ import annotations
 from pydantic import BaseModel, EmailStr, Field
 
 from app.schemas.token import TokenPair
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import UserCreate, UserResponse
 
 
 class RegisterRequest(UserCreate):
     pass
 
 
-class LoginRequest(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
     password: str = Field(min_length=1, max_length=128)
+
+
+class LoginRequest(UserLogin):
+    pass
 
 
 class RefreshRequest(BaseModel):
@@ -33,5 +37,5 @@ class ForgotPasswordResponse(BaseModel):
 
 
 class AuthResponse(BaseModel):
-    user: UserRead
+    user: UserResponse
     tokens: TokenPair

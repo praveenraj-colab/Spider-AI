@@ -70,8 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(response.user);
       },
       register: async (payload) => {
-        const response = await authApi.register(payload);
-        setUser(response.user);
+        await authApi.register(payload);
       },
       logout: async () => {
         await authApi.logout();

@@ -5,7 +5,8 @@ import {
   clearAuthCookies,
   getAccessToken,
   getRefreshToken,
-  setAuthCookies
+  setAuthCookies,
+  type AuthTokens
 } from "@/lib/server/backend";
 
 type RouteContext = {
@@ -61,10 +62,10 @@ async function proxy(request: NextRequest, context: RouteContext) {
       return response;
     }
 
-    const refreshPayload = await refreshResponse.json();
-    backendResponse = await callBackend(refreshPayload.tokens.access_token);
+    const refreshPayload = (await refreshResponse.json()) as AuthTokens;
+    backendResponse = await callBackend(refreshPayload.access_token);
     const response = await toNextResponse(backendResponse);
-    await setAuthCookies(response, refreshPayload.tokens);
+    await setAuthCookies(response, refreshPayload);
     return response;
   }
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { backendUrl, setAuthCookies } from "@/lib/server/backend";
+import { backendUrl } from "@/lib/server/backend";
 
 export async function POST(request: NextRequest) {
   const payload = await request.json();
@@ -16,7 +16,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: backendResponse.status });
   }
 
-  const response = NextResponse.json({ user: data.user }, { status: 201 });
-  await setAuthCookies(response, data.tokens);
-  return response;
+  return NextResponse.json({ user: data }, { status: 201 });
 }
